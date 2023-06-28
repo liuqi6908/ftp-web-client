@@ -1,0 +1,188 @@
+#fileselector {
+  margin-right: 10px;
+}
+#upload-file-selector {
+  display: none;
+}
+.margin-correction {
+  margin-right: 10px;
+}
+body.loading .universal-loader {
+  display: block;
+}
+.universal-loader {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999999;
+  background: url("/images/heart_loader.gif") center center no-repeat;
+  background-size: 120px 120px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.table .name {
+  min-width: 200px;
+}
+.table .type {
+  min-width: 100px;
+}
+.table .size {
+  min-width: 80px;
+}
+.table .time {
+  min-width: 130px;
+}
+.table .operate {
+  min-width: 160px;
+}
+/* Override Font-Awesome */
+/* Color Added for Clarity */
+/* 文本文件 */
+.fa-file-text-o:before,
+.fa-file-txt-o:before {
+  content: "\f0f6";
+  color: #808080;
+}
+/* 文档 */
+.fa-file-word-o:before,
+.fa-file-doc-o:before,
+.fa-file-docx-o:before,
+.fa-file-docm-o:before,
+.fa-file-rtf-o:before {
+  content: "\f1c2";
+  color: #2277bb;
+}
+/* 表格 */
+.fa-file-excel-o:before,
+.fa-file-xls-o:before,
+.fa-file-xlsx-o:before,
+.fa-file-xlsm-o:before,
+.fa-file-csv-o:before,
+.fa-file-ods-o:before {
+  content: "\f1c3";
+  color: #22bb66;
+}
+/* 演示文稿 */
+.fa-file-powerpoint-o:before,
+.fa-file-ppt-o:before,
+.fa-file-pptx-o:before,
+.fa-file-pptm-o:before,
+.fa-file-pps-o:before,
+.fa-file-ppsx-o:before,
+.fa-file-odp-o:before {
+  content: "\f1c4";
+  color: #ff5533;
+}
+/* 图片 */
+.fa-file-image-o:before,
+.fa-file-photo-o:before,
+.fa-file-picture-o:before,
+.fa-file-bmp-o:before,
+.fa-file-gif-o:before,
+.fa-file-jpeg-o:before,
+.fa-file-jpg-o:before,
+.fa-file-png-o:before,
+.fa-file-tiff-o:before,
+.fa-file-tif-o:before,
+.fa-file-svg-o:before,
+.fa-file-ico-o:before,
+.fa-file-psd-o:before,
+.fa-file-ai-o:before,
+.fa-file-eps-o:before,
+.fa-file-raw-o:before,
+.fa-file-webp-o:before,
+.fa-file-heic-o:before,
+.fa-file-heif-o:before {
+  content: "\f1c5";
+  color: #ffaa00;
+}
+/* 压缩包 */
+.fa-file-archive-o:before,
+.fa-file-bz2-o:before,
+.fa-file-dmg-o:before,
+.fa-file-gz-o:before,
+.fa-file-gzip-o:before,
+.fa-file-iso-o:before,
+.fa-file-rar-o:before,
+.fa-file-tar-o:before,
+.fa-file-tgz-o:before,
+.fa-file-zip-o:before,
+.fa-file-zipx-o:before,
+.fa-file-7z-o:before,
+.fa-file-xz-o:before,
+.fa-file-tbz2-o:before,
+.fa-file-txz-o:before,
+.fa-file-lzh-o:before,
+.fa-file-lha-o:before,
+.fa-file-cab-o:before {
+  content: "\f1c6";
+  color: #333355;
+}
+/* pdf */
+.fa-file-pdf-o:before {
+  color: #ff5533;
+}
+/* 音频 */
+.fa-file-sound-o:before,
+.fa-file-mp3-o:before,
+.fa-file-wav-o:before,
+.fa-file-aac-o:before,
+.fa-file-flac-o:before,
+.fa-file-ogg-o:before,
+.fa-file-wma-o:before,
+.fa-file-aiff-o:before,
+.fa-file-m4a-o:before,
+.fa-file-mid-o:before,
+.fa-file-midi-o:before,
+.fa-file-ape-o:before,
+.fa-file-amr-o:before {
+  content: "\f1c7";
+}
+/* 视频 */
+.fa-file-movie-o:before,
+.fa-file-mp4-o:before,
+.fa-file-mov-o:before,
+.fa-file-avi-o:before,
+.fa-file-mkv-o:before,
+.fa-file-wmv-o:before,
+.fa-file-flv-o:before,
+.fa-file-mpeg-o:before,
+.fa-file-3gp-o:before,
+.fa-file-rmvb-o:before,
+.fa-file-webm-o:before {
+  content: "\f1c8";
+}
+/* 代码 */
+.fa-file-code-o:before,
+.fa-file-c-o:before,
+.fa-file-cpp-o:before,
+.fa-file-java-o:before,
+.fa-file-py-o:before,
+.fa-file-html-o:before,
+.fa-file-htm-o:before,
+.fa-file-css-o:before,
+.fa-file-js-o:before,
+.fa-file-php-o:before,
+.fa-file-rb-o:before,
+.fa-file-sql-o:before,
+.fa-file-json-o:before,
+.fa-file-xml-o:before,
+.fa-file-yml-o:before,
+.fa-file-yaml-o:before,
+.fa-file-md-o:before,
+.fa-file-sh-o:before,
+.fa-file-bat-o:before,
+.fa-file-cmd-o:before,
+.fa-file-jar-o:before,
+.fa-file-dll-o:before,
+.fa-file-class-o:before {
+  content: "\f1c9";
+}
+.navbar-right ul {
+  color: "white";
+}
+a:hover {
+  text-decoration: none;
+}

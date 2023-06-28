@@ -1,0 +1,39 @@
+{{! 登录模板 }}
+<div class="container">
+  {{! 登录表单 }}
+  <form onsubmit="return false;">
+    <div class="col-sm-9">
+      <form>
+        <div class="form-group">
+          <label for="host">主机</label>
+          <input
+            type="text"
+            class="form-control"
+            id="host"
+            name="host"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="user">用户名</label>
+          <input type="text" class="form-control" id="user" name="user" />
+        </div>
+        <div class="form-group">
+          <label for="pwd">密码</label>
+          <input type="password" class="form-control" id="pwd" name="pass" />
+        </div>
+        <div class="form-group">
+          <label for="port">端口</label>
+          <input type="text" class="form-control" id="port" name="port" />
+        </div>
+        <div class="form-group checkbox">
+          <input type="checkbox" id="checked" name="checked" />
+          <label for="checked">记住我的凭据</label>
+        </div>
+        <input type="submit" class="btn btn-info login" value="登录" />
+      </form>
+    </div>
+  </form>
+  <div class="col-sm-3">
+  </div>
+</div>
