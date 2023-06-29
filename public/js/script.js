@@ -232,6 +232,7 @@ var FtpListView = Backbone.View.extend({
 
   /** 绑定点击事件 */
   events: {
+    "click .back": "back",
     "click .list": "listDirFile",
     "click .path": "goToPath",
     "click .action": "Action",
@@ -239,7 +240,11 @@ var FtpListView = Backbone.View.extend({
     "click .mkdir": "makeDir",
     "click .newFile": "newFile",
     "click .delete": "delete",
+    "contextmenu .list-row": "contextMenu",
   },
+
+  /** 菜单 */
+  menu: null,
 
   /** 初始化 */
   initialize: function () {
@@ -281,6 +286,11 @@ var FtpListView = Backbone.View.extend({
             var html = template(data);
             that.$el.html(html);
             that.postRender();
+            that.menu = document.querySelector("#menu");
+            // 点击空白区域，隐藏菜单
+            document.addEventListener("click", function () {
+              that.menu.style.display = "none";
+            });
           });
         }.bind(this),
         error: function (a, jqXHR) {
@@ -291,11 +301,7 @@ var FtpListView = Backbone.View.extend({
           // 目录没找到，返回上一级
           var dir = that.model.get("dir");
           if (jqXHR.responseJSON.code == 550 && dir != "/") {
-            var dirs = dir.split("/") || [];
-            if (dirs.length >= 2) dirs.splice(dirs.length - 2, 2);
-            else dirs = [];
-            that.model.set("dir", dirs.join("/") + "/");
-            that.render();
+            that.back();
           }
         },
       }
@@ -307,6 +313,16 @@ var FtpListView = Backbone.View.extend({
     var data = $(event.currentTarget).data();
     if (data.action == "rename") this.rename(data.name);
     else if (data.action == "download") this.download(data.name);
+  },
+
+  /** 返回上一级 */
+  back: function () {
+    var dir = this.model.get("dir");
+    var dirs = dir.split("/") || [];
+    if (dirs.length >= 2) dirs.splice(dirs.length - 2, 2);
+    else dirs = [];
+    this.model.set("dir", dirs.join("/") + "/");
+    this.render();
   },
 
   /** 新建目录 */
@@ -387,7 +403,7 @@ var FtpListView = Backbone.View.extend({
   /** 删除 */
   delete: function (event) {
     var data = $(event.currentTarget).data();
-    if (data.type == "File") this.deleteFile(data);
+    if (data.type == "file") this.deleteFile(data);
     else this.deleteFolder(data);
   },
 
@@ -487,9 +503,9 @@ var FtpListView = Backbone.View.extend({
   /** 上传文件 */
   postRender: function () {
     var that = this;
-    // 为“上传文件”的表单绑定submit方法
-    $("#uplodadfileform").on("submit", function () {
-      var formData = new FormData($(this)[0]);
+    // 自定义submit方法
+    var onsubmit = (el) => {
+      var formData = new FormData(el);
 
       var request = $.ajax({
         url: "/api/ftp/upload",
@@ -512,10 +528,11 @@ var FtpListView = Backbone.View.extend({
           "error"
         );
       });
-    });
+    };
+
     // 选中文件后自动提交
-    this.$el.find("input:file").change(function () {
-      that.$el.find("#uplodadfileform").submit();
+    this.$el.find("input:file").change(function (event) {
+      onsubmit(event.currentTarget.parentElement.parentElement);
     });
   },
 
@@ -545,6 +562,89 @@ var FtpListView = Backbone.View.extend({
       this.render();
     } else {
       this.download(data.name);
+    }
+  },
+
+  /** 右键菜单 */
+  contextMenu: function (event) {
+    var that = this;
+    event.preventDefault();
+    var menu = this.menu,
+      style = menu.style;
+    style.display = "block";
+    if (event.clientX + menu.scrollWidth > window.innerWidth)
+      style.left = event.clientX - menu.scrollWidth + "px";
+    else style.left = event.clientX + "px";
+    if (event.clientY + menu.scrollHeight > window.innerHeight)
+      style.top = event.clientY - menu.scrollHeight + "px";
+    else style.top = event.clientY + "px";
+
+    var data = $(event.currentTarget).data();
+    var ul = menu.getElementsByTagName("ul")[0];
+
+    // 移除所有菜单
+    ul.innerHTML = "";
+
+    // 添加菜单
+    var arr = [
+      {
+        type: ["folder"],
+        name: "打开",
+        click: () => {
+          that.listDirFile({
+            currentTarget: event.currentTarget.querySelector(".list"),
+          });
+        },
+      },
+      {
+        type: ["folder", "file"],
+        name: "重命名",
+        click: () => {
+          that.rename(data.name);
+        },
+      },
+      {
+        type: ["folder", "file"],
+        name: "删除",
+        click: () => {
+          that.delete({
+            currentTarget: event.currentTarget.querySelector(".list"),
+          });
+        },
+      },
+      {
+        type: ["file"],
+        name: "下载",
+        click: () => {
+          that.download(data.name);
+        },
+      },
+      {
+        type: ["folder", "file"],
+        name: "复制路径",
+        click: () => {
+          var path =
+            this.model.get("dir") +
+            data.name +
+            (data.type == "folder" ? "/" : "");
+          var input = document.createElement("textarea");
+          input.value = path;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("Copy");
+          document.body.removeChild(input);
+          window.App.flash("Copy success", "success");
+        },
+      },
+    ];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].type.indexOf(data.type) > -1) {
+        var li = document.createElement("li");
+        li.innerText = arr[i].name;
+        // 添加点击事件
+        li.addEventListener("click", arr[i].click);
+        ul.appendChild(li);
+      }
     }
   },
 });

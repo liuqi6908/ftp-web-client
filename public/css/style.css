@@ -22,6 +22,12 @@ body.loading .universal-loader {
   background-size: 120px 120px;
   background-color: rgba(0, 0, 0, 0.4);
 }
+.table .list-row {
+  cursor: default;
+}
+.table .list-row:hover {
+  background-color: #f9f9f9;
+}
 .table .name {
   min-width: 200px;
 }
@@ -36,6 +42,28 @@ body.loading .universal-loader {
 }
 .table .operate {
   min-width: 160px;
+}
+#menu {
+  width: 120px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: absolute;
+  box-shadow: 2px 2px 8px 1px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  background: white;
+  display: none;
+}
+#menu ul {
+  padding: 0;
+  margin: 0;
+}
+#menu li {
+  list-style: none;
+  padding: 10px 0;
+  cursor: pointer;
+}
+#menu li:hover {
+  background: #eee;
 }
 /* Override Font-Awesome */
 /* Color Added for Clarity */

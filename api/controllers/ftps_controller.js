@@ -342,21 +342,6 @@ function deleteFolder(ftp, path) {
   });
 }
 
-function deleteFile(ftp, path, res) {
-  return new Promise((resolve, reject) => {
-    console.log("删除文件" + path);
-    ftp.raw.dele(path, (err) => {
-      if (err) {
-        res
-          .status(500)
-          .json({ message: formatError(err.message), code: err.code });
-        return reject(err);
-      }
-      resolve();
-    });
-  });
-}
-
 // TODO 移动文件
 ftps.move = function () {
   try {

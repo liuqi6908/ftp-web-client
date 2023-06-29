@@ -19,6 +19,7 @@
 - [Handlebars] - 很棒的模板引擎
 - [Twitter Bootstrap] - 适用于现代 Web 应用程序的出色 UI 样板
 - [jQuery] - 一个轻量级、“少写，多做”的 JavaScript 库
+- [jsftp] - node.js 的健全 FTP 客户端实现
 
 ## 部署网址
 

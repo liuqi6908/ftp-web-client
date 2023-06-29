@@ -16,6 +16,9 @@
 
   {{!-- 操作栏 --}}
   <div style="margin-bottom:20px; line-height: 2;">
+    <span class="btn btn-xs btn-warning back" style="margin-right: 10px;">
+      <i class="fa fa-arrow-left"></i> 返回上一级
+    </span>
     <span class="btn btn-xs btn-warning refresh" style="margin-right: 10px;">
       <i class="fa fa-refresh"></i> 刷新文件夹
     </span>
@@ -54,11 +57,11 @@
       {{!-- 表格主体 --}}
       <tbody>
         {{#each ftpdirlist}}
-        <tr>
+        <tr class="list-row" data-type="{{#when type 'eq' 'Directory'}}folder{{else}}file{{/when}}" data-name='{{name}}'>
           {{!-- 名称 --}}
           <td width='300px' class="name">
-            <span class="list" style="cursor: pointer;" data-type="{{#when type 'eq' 'Directory'}}folder{{else}} file{{/when}}"
-              data-name='{{name}}'>
+            <span class="list" style="cursor: pointer;"
+              data-type="{{#when type 'eq' 'Directory'}}folder{{else}}file{{/when}}" data-name='{{name}}'>
               {{!-- 图标 --}}
               <span>
                 <i class="fa {{#when type 'eq' 'Directory'}} fa-folder {{else}} {{#fileIcon name}} {{/fileIcon}} {{/when}} "
@@ -81,7 +84,7 @@
             <input type='button' class="btn btn-xs action" style="margin-right: 10px;" value="重命名" data-action='rename'
               data-name='{{name}}' />
             <input type='button' class="btn btn-xs btn-danger delete" style="margin-right: 5px;" value="删除"
-              data-type='{{type}}' data-name='{{name}}' />
+              data-type="{{#when type 'eq' 'Directory'}}folder{{else}}file{{/when}}" data-name='{{name}}' />
             {{#when type 'eq' 'File'}}
             <span>
               <a href='#' class="btn btn-xs action" data-action='download' data-name='{{name}}'>
@@ -94,5 +97,10 @@
         {{/each}}
       </tbody>
     </table>
+  </div>
+
+  {{!-- 右键菜单 --}}
+  <div id="menu">
+    <ul></ul>
   </div>
 </div>
