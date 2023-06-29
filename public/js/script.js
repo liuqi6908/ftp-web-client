@@ -635,13 +635,21 @@ var FtpListView = Backbone.View.extend({
   copyPath: function (data) {
     var path =
       this.model.get("dir") + data.name + (data.type == "folder" ? "/" : "");
-    var input = document.createElement("textarea");
+    navigator.clipboard
+      .writeText(path)
+      .then(() => {
+        window.App.flash("Copy success", "success");
+      })
+      .catch((err) => {
+        window.App.flash(err?.message || "Something went wrong", "error");
+      });
+    /* var input = document.createElement("textarea");
     input.value = path;
     document.body.appendChild(input);
     input.select();
     document.execCommand("Copy");
     document.body.removeChild(input);
-    window.App.flash("Copy success", "success");
+    window.App.flash("Copy success", "success"); */
   },
 
   /** 右键菜单 */
