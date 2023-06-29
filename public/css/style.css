@@ -52,6 +52,7 @@ body.loading .universal-loader {
   text-align: center;
   background: white;
   display: none;
+  overflow: hidden;
 }
 #menu ul {
   padding: 0;

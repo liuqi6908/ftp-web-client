@@ -232,13 +232,14 @@ var FtpListView = Backbone.View.extend({
 
   /** 绑定点击事件 */
   events: {
-    "click .back": "back",
-    "click .list": "listDirFile",
     "click .path": "goToPath",
-    "click .action": "Action",
+    "click .back": "back",
     "click .refresh": "render",
     "click .mkdir": "makeDir",
     "click .newFile": "newFile",
+    "click .paste": "paste",
+    "click .list": "listDirFile",
+    "click .action": "Action",
     "click .delete": "delete",
     "contextmenu .list-row": "contextMenu",
   },
@@ -291,6 +292,9 @@ var FtpListView = Backbone.View.extend({
             document.addEventListener("click", function () {
               that.menu.style.display = "none";
             });
+            document.querySelector(".paste").className =
+              "btn btn-xs btn-warning paste" +
+              (that.model.get("file") ? "" : " disabled");
           });
         }.bind(this),
         error: function (a, jqXHR) {
@@ -308,11 +312,20 @@ var FtpListView = Backbone.View.extend({
     );
   },
 
-  /** 操作 */
-  Action: function (event) {
+  /** 跳转指定路径 */
+  goToPath: function (event) {
     var data = $(event.currentTarget).data();
-    if (data.action == "rename") this.rename(data.name);
-    else if (data.action == "download") this.download(data.name);
+    var dirs = this.model.get("dirs") || [];
+    dirs = JSON.parse(JSON.stringify(dirs));
+    dirs.pop();
+    if (data.index >= 0) {
+      var dir = "";
+      for (var i = 0; i <= data.index; i++) {
+        dir += dirs[i] + "/";
+      }
+      this.model.set("dir", dir);
+      this.render();
+    }
   },
 
   /** 返回上一级 */
@@ -368,6 +381,106 @@ var FtpListView = Backbone.View.extend({
         );
       });
     }
+  },
+
+  /** 上传文件 */
+  postRender: function () {
+    var that = this;
+    // 自定义submit方法
+    var onsubmit = (el) => {
+      var formData = new FormData(el);
+
+      var request = $.ajax({
+        url: "/api/ftp/upload",
+        type: "POST",
+        data: formData,
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+
+      request.success(function () {
+        window.App.flash("Upload success ", "success");
+        that.render();
+      });
+
+      request.error(function (jqXHR) {
+        window.App.flash(
+          jqXHR.responseJSON?.message || "Something went wrong",
+          "error"
+        );
+      });
+    };
+
+    // 选中文件后自动提交
+    this.$el.find("input:file").change(function (event) {
+      onsubmit(event.currentTarget.parentElement.parentElement);
+    });
+  },
+
+  /** 粘贴文件 */
+  paste: function () {
+    var file = this.model.get("file");
+    if (!file) return;
+
+    var formData = new FormData();
+    var that = this;
+    formData.append("file", new File([file.blob], file.data.name));
+    formData.append("dir", this.model.get("dir"));
+
+    var request = $.ajax({
+      url: "/api/ftp/upload",
+      type: "POST",
+      data: formData,
+      async: false,
+      cache: false,
+      contentType: false,
+      processData: false,
+    });
+
+    request.success(function () {
+      window.App.flash("Paste success ", "success");
+      // 剪切，删除原文件
+      if (file.type == 2) {
+        $.ajax({
+          url: "/api/ftp/deleteFile",
+          type: "POST",
+          data: file.data,
+        });
+      }
+      that.model.set("file", null);
+      document.querySelector(".paste").className =
+        "btn btn-xs btn-warning paste disabled";
+      that.render();
+    });
+
+    request.error(function (jqXHR) {
+      window.App.flash(
+        jqXHR.responseJSON?.message || "Something went wrong",
+        "error"
+      );
+    });
+  },
+
+  /** 获取文件列表 */
+  listDirFile: function (event) {
+    var data = $(event.currentTarget).data();
+    if (data.type == "folder") {
+      var dir = this.model.get("dirs") || [];
+      dir = dir.join("/");
+      this.model.set("dir", dir + data.name + "/");
+      this.render();
+    } else {
+      this.download(data.name);
+    }
+  },
+
+  /** 操作 */
+  Action: function (event) {
+    var data = $(event.currentTarget).data();
+    if (data.action == "rename") this.rename(data.name);
+    else if (data.action == "download") this.download(data.name);
   },
 
   /** 重命名 */
@@ -463,23 +576,41 @@ var FtpListView = Backbone.View.extend({
   },
 
   /** 下载文件 */
-  download: function (name) {
+  download: function (name, type) {
     const that = this;
 
     var path = this.model.get("dirs") || [];
     path = path.join("/");
+    var data = {
+      name,
+      path,
+    };
 
     var request = $.ajax({
       url: "/api/ftp/download",
       type: "POST",
-      data: { path, name },
+      data,
       responseType: "arraybuffer",
     });
 
     request.success(function (result) {
       var blob = new Blob([that.binaryStringToBuffer(result)]);
-      saveAs(blob, name);
-      window.App.flash("Download success", "success");
+      if (type) {
+        that.model.set("file", {
+          blob,
+          data,
+          type,
+        });
+        window.App.flash(
+          (type == 1 ? "Copy" : "Shear") + " success",
+          "success"
+        );
+        document.querySelector(".paste").className =
+          "btn btn-xs btn-warning paste";
+      } else {
+        saveAs(blob, name);
+        window.App.flash("Download success", "success");
+      }
     });
 
     request.error(function (jqXHR) {
@@ -500,69 +631,17 @@ var FtpListView = Backbone.View.extend({
     return buffer;
   },
 
-  /** 上传文件 */
-  postRender: function () {
-    var that = this;
-    // 自定义submit方法
-    var onsubmit = (el) => {
-      var formData = new FormData(el);
-
-      var request = $.ajax({
-        url: "/api/ftp/upload",
-        type: "POST",
-        data: formData,
-        async: false,
-        cache: false,
-        contentType: false,
-        processData: false,
-      });
-
-      request.success(function () {
-        window.App.flash("Upload success ", "success");
-        that.render();
-      });
-
-      request.error(function (jqXHR) {
-        window.App.flash(
-          jqXHR.responseJSON?.message || "Something went wrong",
-          "error"
-        );
-      });
-    };
-
-    // 选中文件后自动提交
-    this.$el.find("input:file").change(function (event) {
-      onsubmit(event.currentTarget.parentElement.parentElement);
-    });
-  },
-
-  /** 跳转指定路径 */
-  goToPath: function (event) {
-    var data = $(event.currentTarget).data();
-    var dirs = this.model.get("dirs") || [];
-    dirs = JSON.parse(JSON.stringify(dirs));
-    dirs.pop();
-    if (data.index >= 0) {
-      var dir = "";
-      for (var i = 0; i <= data.index; i++) {
-        dir += dirs[i] + "/";
-      }
-      this.model.set("dir", dir);
-      this.render();
-    }
-  },
-
-  /** 获取文件列表 */
-  listDirFile: function (event) {
-    var data = $(event.currentTarget).data();
-    if (data.type == "folder") {
-      var dir = this.model.get("dirs") || [];
-      dir = dir.join("/");
-      this.model.set("dir", dir + data.name + "/");
-      this.render();
-    } else {
-      this.download(data.name);
-    }
+  /** 复制路径 */
+  copyPath: function (data) {
+    var path =
+      this.model.get("dir") + data.name + (data.type == "folder" ? "/" : "");
+    var input = document.createElement("textarea");
+    input.value = path;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand("Copy");
+    document.body.removeChild(input);
+    window.App.flash("Copy success", "success");
   },
 
   /** 右键菜单 */
@@ -620,20 +699,24 @@ var FtpListView = Backbone.View.extend({
         },
       },
       {
+        type: ["file"],
+        name: "复制",
+        click: () => {
+          that.download(data.name, 1);
+        },
+      },
+      {
+        type: ["file"],
+        name: "剪切",
+        click: () => {
+          that.download(data.name, 2);
+        },
+      },
+      {
         type: ["folder", "file"],
         name: "复制路径",
         click: () => {
-          var path =
-            this.model.get("dir") +
-            data.name +
-            (data.type == "folder" ? "/" : "");
-          var input = document.createElement("textarea");
-          input.value = path;
-          document.body.appendChild(input);
-          input.select();
-          document.execCommand("Copy");
-          document.body.removeChild(input);
-          window.App.flash("Copy success", "success");
+          that.copyPath(data);
         },
       },
     ];
