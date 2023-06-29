@@ -13,7 +13,6 @@ server.engine("html", require("ejs").renderFile);
 server.use(express.static(__dirname + "/public"));
 server.use(cookieParser("secret12"));
 server.use(express.favicon("favicon.ico"));
-console.log("Config name: ", config.name);
 server.use(
   session({
     secret: "secret12",
@@ -48,5 +47,7 @@ server.get("/", function (req, res, next) {
 });
 global.dirname = __dirname;
 http.createServer(server).listen(process.env.PORT || config.port, function () {
-  console.log("Ftp 客户端监听端口 =====> " + (process.env.PORT || config.port));
+  console.log(
+    "Ftp 客户端 监听端口 =====> " + (process.env.PORT || config.port)
+  );
 });

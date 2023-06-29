@@ -313,7 +313,6 @@ function deleteFolder(ftp, path) {
               len--;
               if (len === 0) {
                 // 子文件夹删除完成后删除当前文件夹
-                console.log("2删除文件夹" + path);
                 ftp.raw.rmd(path, (err) => {
                   if (err) reject(err);
                   else resolve();
