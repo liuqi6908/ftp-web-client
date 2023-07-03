@@ -34,8 +34,8 @@
 该项目需要 [Node.js](https://nodejs.org/) v4+ 才能运行。
 
 ```plaintext
-git clone https://github.com/liuqi6908/ftp-client.git
-cd ftp-client
+git clone https://github.com/liuqi6908/ftp-web-client.git
+cd ftp-web-client
 npm install
 npm start 或 node index.js
 ```
