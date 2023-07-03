@@ -27,7 +27,7 @@
 
 ## github
 
-[ftp-client](https://github.com/liuqi6908/ftp-client/)
+[ftp-web-client](https://github.com/liuqi6908/ftp-web-client/)
 
 ## 下载运行
 
